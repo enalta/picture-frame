@@ -9,6 +9,7 @@
 
 #define FIELD_NAME_MAX_SIZE 10
 #define SIMPLE_TYPE_MAX_SIZE 15
+#define VA_ARGS_BUFFFERSIZE 64
 
 
 
@@ -72,7 +73,7 @@ void __insert_fields(Negative negative, int fieldNumber, char* va_args);
 void __insert_types(Negative negative, int typesNumber, ...);
 
 void __insert_captures(Negative negative, int captureNumber, ...);
-void develop(Negative negative, void* paper, int size, char* name);
+//void develop(Negative negative, void* paper, int size, char* name);
 void capture(Negative negative, int size);
 
 #define DECLARE_FIELDS(X, ...)\

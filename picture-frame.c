@@ -2,23 +2,24 @@
 
 #include <string.h>
 #include <stdarg.h>
-#include "json-builder.h"
+//#include "json-builder.h"
 #include "config.h"
-
 
 
 void __insert_fields(Negative negative, int fieldNumber, char* va_args){
 	int i;
 	char* token;
+	char va_args_buffer[VA_ARGS_BUFFFERSIZE];
 
-	token = strtok(va_args, ",");
+	memcpy(va_args_buffer, va_args, strlen(va_args));
+	token = strtok(va_args_buffer, ", ");
 
 	for(i = 0; i < fieldNumber; i++){
-		memcpy(negative[i].name, token, strlen(token));
+		memcpy(negative[i].name, token, strlen(token) + 1);
 		negative[i].value.genericValue.capture = NULL;
 		negative[i].value.genericValue.type = NO_TYPE;
 		negative[i].value.genericValue.valid = INVALID;
-		token = strtok(NULL, ",");
+		token = strtok(NULL, ", ");
 		if(!token) return;
 	}
 }
@@ -94,7 +95,7 @@ void capture(Negative negative, int size){
 		}
 	}
 }
-
+/*
 void develop(Negative negative, void* paper, int size, char* name){
 		int i;
 
@@ -134,4 +135,4 @@ void develop(Negative negative, void* paper, int size, char* name){
 #endif
 			}
 		}
-}
+}*/
