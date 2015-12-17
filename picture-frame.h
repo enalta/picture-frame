@@ -36,7 +36,8 @@ typedef enum {
 struct Simple_Value{
 	Simple_Value_Type type;
 	Validity valid;
-	void* (*capture)(void);
+	void* (*capture)(void*);
+	void* source;
 	char value[SIMPLE_TYPE_MAX_SIZE];
 
 };
@@ -45,6 +46,7 @@ struct Complex_Value{
 	Complex_Value_Type type;
 	Validity valid;
 	void* (*capture)(void*);
+	void* source;
 	void* negative;
 	int negativeSize;
 };
@@ -53,6 +55,7 @@ struct Generic_value{
 	int type;
 	Validity valid;
 	void* (*capture)(void*);
+	void* source;
 };
 
 union Value{
@@ -71,9 +74,10 @@ typedef struct Field* Negative;
 
 void __insert_fields(Negative negative, int fieldNumber, char* va_args);
 void __insert_types(Negative negative, int typesNumber, ...);
+void __insert_sources(Negative negative, int sourcesNumber, ...);
 
 void __insert_captures(Negative negative, int captureNumber, ...);
-//void develop(Negative negative, void* paper, int size, char* name);
+void develop(Negative negative, void* paper, int size, char* name);
 void capture(Negative negative, int size);
 
 #define DECLARE_FIELDS(X, ...)\
@@ -85,6 +89,8 @@ __insert_fields(X, X##_FIELD_TOTALS, #__VA_ARGS__);
 
 #define DECLARE_TYPES(X, ...) __insert_types(X, X##_FIELD_TOTALS, __VA_ARGS__);
 #define DECLARE_CAPTURES(X, ...) __insert_captures(X, X##_FIELD_TOTALS, __VA_ARGS__);
+
+#define DECLARE_SOURCES(X, ...) __insert_sources(X, X##_FIELD_TOTALS, __VA_ARGS__);
 
 
 #endif

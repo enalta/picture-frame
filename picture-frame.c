@@ -1,9 +1,9 @@
-#include "picture-frame.h"
-
 #include <string.h>
 #include <stdarg.h>
-//#include "json-builder.h"
+#include "json-builder.h"
 #include "config.h"
+
+#include "picture-frame.h"
 
 
 void __insert_fields(Negative negative, int fieldNumber, char* va_args){
@@ -47,6 +47,16 @@ void __insert_captures(Negative negative, int captureNumber, ...){
 	va_end(list);
 }
 
+void __insert_sources(Negative negative, int sourcesNumber, ...){
+	va_list list;
+	int i;
+	va_start(list, sourcesNumber);
+	for(i = 0; i < sourcesNumber; i++){
+		negative[i].value.genericValue.source = va_arg(list, void*);
+	}
+	va_end(list);
+}
+
 void capture(Negative negative, int size){
 	int i;
 	int j;
@@ -57,22 +67,31 @@ void capture(Negative negative, int size){
 		case NO_TYPE:
 			break;
 		case STRING:
-			capturedString = negative[i].value.simpleValue.capture();
-			memcpy(negative[i].value.simpleValue.value, capturedString, strlen(capturedString));
-			negative[i].value.simpleValue.valid = VALID;
+			capturedString = negative[i].value.simpleValue.capture(negative[i].value.simpleValue.source);
+			if(capturedString != NULL){
+				memcpy(negative[i].value.simpleValue.value, capturedString, strlen(capturedString));
+				negative[i].value.simpleValue.valid = VALID;
+			}
+			else negative[i].value.simpleValue.valid = INVALID;
 			break;
 		case NUMBER:
-			capturedString = negative[i].value.simpleValue.capture();
-			memcpy(negative[i].value.simpleValue.value, capturedString, strlen(capturedString));
-			negative[i].value.simpleValue.valid = VALID;
+			capturedString = negative[i].value.simpleValue.capture(negative[i].value.simpleValue.source);
+			if(capturedString != NULL){
+				memcpy(negative[i].value.simpleValue.value, capturedString, strlen(capturedString));
+				negative[i].value.simpleValue.valid = VALID;
+			}
+			else negative[i].value.simpleValue.valid = INVALID;
 			break;
 		case BOOLEAN:
-			capturedString = negative[i].value.simpleValue.capture();
-			memcpy(negative[i].value.simpleValue.value, capturedString, strlen(capturedString));
-			negative[i].value.simpleValue.valid = VALID;
+			capturedString = negative[i].value.simpleValue.capture(negative[i].value.simpleValue.source);
+			if(capturedString != NULL){
+				memcpy(negative[i].value.simpleValue.value, capturedString, strlen(capturedString));
+				negative[i].value.simpleValue.valid = VALID;
+			}
+			else negative[i].value.simpleValue.valid = INVALID;
 			break;
 
-		case DOCUMENT:
+/*		case DOCUMENT:
 			for(j = 0; i < negative[i].value.complexValue.negativeSize; j++){
 				if(((Negative)(negative[i].value.complexValue.negative))->value.genericValue.valid != VALID){
 					negative[i].value.complexValue.valid = INVALID;
@@ -91,48 +110,52 @@ void capture(Negative negative, int size){
 			negative[i].value.complexValue.valid = VALID;
 			break;
 		default:
-			break;
+			break;*/
 		}
 	}
 }
-/*
+
 void develop(Negative negative, void* paper, int size, char* name){
 		int i;
 
 		Serialized_Document* document = (Serialized_Document*)paper;
-
 		startNewDocument(document, name);
 
 
 		for(i = 0; i < size; i++){
-			switch (negative[i].value.genericValue.type){
-			case STRING:
-				insertString(document, negative[i].name, negative[i].value.simpleValue.value);
-				negative[i].value.simpleValue.valid = INVALID;
-			break;
-			case NUMBER:
-				insertNumber(document, negative[i].name, negative[i].value.simpleValue.value);
-				negative[i].value.simpleValue.valid = INVALID;
-				break;
-			case BOOLEAN:
-				if(strstr(negative[i].value.simpleValue.value, "true") == 0) insertTrue(document, negative[i].name);
-				if(strstr(negative[i].value.simpleValue.value, "false") == 0) insertFalse(document, negative[i].name);
-				negative[i].value.simpleValue.valid = INVALID;
-				break;
-			case NULL_VALUE:
-				if(strstr(negative[i].value.simpleValue.value, "true") == 0) insertTrue(document, negative[i].name);
-				if(strstr(negative[i].value.simpleValue.value, "false") == 0)insertFalse(document, negative[i].name);
-				negative[i].value.simpleValue.valid = INVALID;
-				break;
-#ifdef USE_RECURSIVE_DEVELOPMENT
-			case DOCUMENT:
-				develop(negative[i].value.complexValue.negative, document, negative[i].value.complexValue.negativeSize, negative[i].name);
-			break;
-			case ARRAY:
-				break;
-			default:
-				break;
-#endif
+			if(negative[i].value.genericValue.valid == VALID){
+				switch (negative[i].value.genericValue.type){
+					case STRING:
+						insertString(document, negative[i].name, negative[i].value.simpleValue.value);
+						negative[i].value.simpleValue.valid = INVALID;
+						break;
+					case NUMBER:
+						insertNumber(document, negative[i].name, negative[i].value.simpleValue.value);
+						negative[i].value.simpleValue.valid = INVALID;
+						break;
+					case BOOLEAN:
+						if(strstr(negative[i].value.simpleValue.value, "true") == 0) insertTrue(document, negative[i].name);
+						if(strstr(negative[i].value.simpleValue.value, "false") == 0) insertFalse(document, negative[i].name);
+						negative[i].value.simpleValue.valid = INVALID;
+						break;
+					case NULL_VALUE:
+						if(strstr(negative[i].value.simpleValue.value, "true") == 0) insertTrue(document, negative[i].name);
+						if(strstr(negative[i].value.simpleValue.value, "false") == 0)insertFalse(document, negative[i].name);
+						negative[i].value.simpleValue.valid = INVALID;
+						break;
+/*#ifdef USE_RECURSIVE_DEVELOPMENT
+							case DOCUMENT:
+								develop(negative[i].value.complexValue.negative, document, negative[i].value.complexValue.negativeSize, negative[i].name);
+							break;
+							case ARRAY:
+								break;
+							default:
+								break;
+#endif*/
+					}
+
 			}
+
 		}
-}*/
+		closeDocument(document);
+}
