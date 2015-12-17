@@ -79,6 +79,9 @@ void __insert_sources(Negative negative, int sourcesNumber, ...);
 void __insert_captures(Negative negative, int captureNumber, ...);
 void develop(Negative negative, void* paper, int size, char* name);
 void capture(Negative negative, int size);
+void set_validity(Negative negative, int fieldIndex, Validity validity);
+
+#define EVAL(X) X
 
 #define DECLARE_FIELDS(X, ...)\
 \

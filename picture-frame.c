@@ -159,3 +159,7 @@ void develop(Negative negative, void* paper, int size, char* name){
 		}
 		closeDocument(document);
 }
+
+void set_validity(Negative negative, int fieldIndex, Validity validity){
+	negative[fieldIndex].value.genericValue.valid = validity;
+}
