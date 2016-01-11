@@ -36,7 +36,7 @@ typedef enum {
 struct Simple_Value{
 	Simple_Value_Type type;
 	Validity valid;
-	void* (*capture)(void*);
+	char* (*capture)(void*);
 	void* source;
 	char value[SIMPLE_TYPE_MAX_SIZE];
 
@@ -45,7 +45,7 @@ struct Simple_Value{
 struct Complex_Value{
 	Complex_Value_Type type;
 	Validity valid;
-	void* (*capture)(void*);
+	char* (*capture)(void*);
 	void* source;
 	void* negative;
 	int negativeSize;
@@ -54,7 +54,7 @@ struct Complex_Value{
 struct Generic_value{
 	int type;
 	Validity valid;
-	void* (*capture)(void*);
+	char* (*capture)(void*);
 	void* source;
 };
 
@@ -81,19 +81,14 @@ void develop(Negative negative, void* paper, int size, char* name);
 void capture(Negative negative, int size);
 void set_validity(Negative negative, int fieldIndex, Validity validity);
 
-#define EVAL(X) X
+#define DECLARE_FIELDS(X, ...)  char* X##_FIELDS_STRING = #__VA_ARGS__;\
+								enum {__VA_ARGS__ , X##_FIELD_TOTALS};\
+								struct Field X##_Fields[X##_FIELD_TOTALS];\
+								Negative X = X##_Fields;
 
-#define DECLARE_FIELDS(X, ...)\
-\
-enum {__VA_ARGS__ , X##_FIELD_TOTALS};\
-struct Field X##_Fields[X##_FIELD_TOTALS];\
-Negative X = X##_Fields;\
-__insert_fields(X, X##_FIELD_TOTALS, #__VA_ARGS__);
-
-#define DECLARE_TYPES(X, ...) __insert_types(X, X##_FIELD_TOTALS, __VA_ARGS__);
-#define DECLARE_CAPTURES(X, ...) __insert_captures(X, X##_FIELD_TOTALS, __VA_ARGS__);
-
-#define DECLARE_SOURCES(X, ...) __insert_sources(X, X##_FIELD_TOTALS, __VA_ARGS__);
-
+#define INSERT_FIELDS(X) __insert_fields(X, X##_FIELD_TOTALS, X##_FIELDS_STRING);
+#define INSERT_TYPES(X, ...) __insert_types(X, X##_FIELD_TOTALS, __VA_ARGS__);
+#define INSERT_CAPTURES(X, ...) __insert_captures(X, X##_FIELD_TOTALS, __VA_ARGS__);
+#define INSERT_SOURCES(X, ...) __insert_sources(X, X##_FIELD_TOTALS, __VA_ARGS__);
 
 #endif

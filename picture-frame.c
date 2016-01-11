@@ -59,7 +59,6 @@ void __insert_sources(Negative negative, int sourcesNumber, ...){
 
 void capture(Negative negative, int size){
 	int i;
-	int j;
 	char* capturedString;
 
 	for(i = 0; i < size; i++){
